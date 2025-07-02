@@ -1,0 +1,4 @@
+# .gitignore
+
+# 仮想環境フォルダ
+.venv/
