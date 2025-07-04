@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>シミュレーションデモ</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+
+<body>
+
+    <h1>シミュレーションデモ</h1>
+
+    <div class="container">
+        <div>
+            <h2>パラメータ時系列グラフ</h2>
+            <canvas id="myChart" width="400" height="200"
+                data-csv-url="{{ url_for('static', path='data.csv') }}"></canvas>
+        </div>
+
+        <div>
+            <h2>Unityシミュレーション動画</h2>
+            <video width="400" controls muted loop src="{{ url_for('static', path='simulation.mp4') }}"></video>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="segment-container">
+        <h2>枕セグメントの操作</h2>
+        <p>下の四角をクリックすると、対応する数値がPythonに送られます。</p>
+        <div id="pillow-segments" data-send-url="{{ url_for('receive_data') }}">
+            <div class="segment" data-segment="1">1</div>
+            <div class="segment" data-segment="2">2</div>
+            <div class="segment" data-segment="3">3</div>
+            <div class="segment" data-segment="4">4</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+</body>
+
+</html>
