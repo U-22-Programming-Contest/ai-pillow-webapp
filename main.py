@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """
-    ルートURLにアクセスがあった場合にindex.htmlを返す
+    ルートURL(http://127.0.0.1:8000)にアクセスがあった場合にindex.htmlを返す
     """
     return templates.TemplateResponse("index.html", {"request": request})
 
