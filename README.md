@@ -44,6 +44,54 @@
 
 ---
 
+### 📦 環境構築
+
+#### ステップ1: プロジェクトをダウンロードする
+まず、Gitを使ってリポジトリを自分のPCにコピー（クローン）します。
+
+```
+git clone https://github.com/U-22-Programming-Contest/ai-pillow-webapp.git
+```
+
+#### ステップ2: 仮想環境を作成して有効化する
+次に、このプロジェクト専用のPython環境を新しく作ります。
+
+[Python 3.11.9](https://www.python.org/downloads/release/python-3119/) をインストールして次のコマンドを実行します。
+
+仮想環境を作成
+```
+py -3.11 -m venv .venv
+```
+
+仮想環境を有効化 (Windows)
+```
+.venv\Scripts\activate
+```
+
+仮想環境を有効化 (macOS/Linux)
+```
+source .venv/bin/activate
+```
+
+#### ステップ3: ライブラリを一括インストールする
+最後に、requirements.txt を使って、プロジェクトに必要なライブラリをすべてインストールします。
+```
+pip install -r requirements.txt
+```
+
+pipが requirements.txt の中身を読み込み、記載されているライブラリ（それらが依存する他のライブラリ）を自動で仮想環境にインストールしてくれます。
+
+---
+
+### Webサイトを開く
+次のコマンドでサーバーを起動します。
+```
+uvicorn main:app --reload
+```
+そして、http://127.0.0.1:8000 を開くと、Webサイトを開けます。
+
+---
+
 ### 🖼️ 出力イメージ例
 <p align="center">
   <img src="image/image_webapp1.png" width="45%" style="display:inline-block; margin-right:10px;" />
