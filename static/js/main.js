@@ -1,26 +1,43 @@
-// $(function() { ... }) は、HTMLの読み込みが完了したら中のコードを実行するという意味
 $(function () {
-
-    // --- 1. CSVデータのグラフ表示 ---
     const drawChart = () => {
-        const $chartCanvas = $('#myChart'); // jQueryで要素を選択
+        const $chartCanvas = $('#myChart');
         if ($chartCanvas.length === 0) return;
 
-        // jQueryでdata属性からURLを取得
         const csvUrl = $chartCanvas.data('csv-url');
 
-        // jQueryのAjax通信 (GET)
         $.get(csvUrl, (csvData) => {
-            const rows = csvData.trim().split('\n').slice(1);
-            const labels = [];
-            const pressureData = [];
-            const airAmountData = [];
+            const rows = csvData.trim().split('\n');
 
-            rows.forEach(row => {
-                const [time, pressure, airAmount] = row.split(',');
-                labels.push(time);
-                pressureData.push(parseFloat(pressure));
-                airAmountData.push(parseFloat(airAmount));
+            // 1行目のヘッダーを取得し、グラフのラベルとして使用
+            const headers = rows[0].split(',').slice(0, 10); // Pressure1-4, AirPressure1-6 の10列分
+
+            // 各列のデータを保存する配列を準備
+            const datasets = headers.map(header => ({
+                label: header,
+                data: [],
+                tension: 0.1,
+                borderWidth: 2, // 線の太さを少し太くする
+                hidden: true, // 最初は非表示にしておく
+            }));
+
+            // 最初の2つ（Pressure1, AirPressure1）だけ表示状態にする
+            if (datasets.length > 0) datasets[0].hidden = false;
+            if (datasets.length > 4) datasets[4].hidden = false;
+
+
+            const labels = [];
+            const dataRows = rows.slice(1); // 2行目以降のデータ行
+
+            dataRows.forEach((row, index) => {
+                // 行番号をラベルとして使用
+                labels.push(index + 1);
+
+                const values = row.split(',');
+
+                // 最初の10列のデータをそれぞれのdatasetに追加
+                for (let i = 0; i < headers.length; i++) {
+                    datasets[i].data.push(parseFloat(values[i]));
+                }
             });
 
             const ctx = $chartCanvas[0].getContext('2d');
@@ -28,17 +45,33 @@ $(function () {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: '圧力',
-                        data: pressureData,
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        tension: 0.1
-                    }, {
-                        label: '空気圧量',
-                        data: airAmountData,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        tension: 0.1
-                    }]
+                    datasets: datasets // 作成したデータセットの配列を渡す
+                },
+                options: {
+                    // 凡例（ラベル）をクリックして表示・非表示を切り替えられる
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'データ行番号 (時間経過)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '圧力'
+                            }
+                        }
+                    }
                 }
             });
         }).fail((error) => {
@@ -46,19 +79,13 @@ $(function () {
         });
     };
 
-    // --- 2. 枕セグメントのクリックとデータ送信 ---
+    // --- 枕セグメントのクリック処理 (変更なし) ---
     const setupSegmentClick = () => {
         const $segmentsContainer = $('#pillow-segments');
         if ($segmentsContainer.length === 0) return;
-
         const sendDataUrl = $segmentsContainer.data('send-url');
-
-        // jQueryのイベント委任 (より簡潔)
-        // #pillow-segments の中の .segment がクリックされた時だけ実行
         $segmentsContainer.on('click', '.segment', function () {
-            const segmentNumber = $(this).data('segment'); // クリックされた要素のdata属性を取得
-
-            // jQueryのAjax通信 (POST)
+            const segmentNumber = $(this).data('segment');
             $.ajax({
                 url: sendDataUrl,
                 type: 'POST',
@@ -71,12 +98,10 @@ $(function () {
                 })
                 .fail((error) => {
                     console.error('データ送信エラー:', error);
-                    alert('データの送信に失敗しました。');
                 });
         });
     };
 
-    // 各関数を実行
     drawChart();
     setupSegmentClick();
 });
