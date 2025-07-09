@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 
 class SegmentData(BaseModel):
-    segment: str
+    segment: int
 
 
 # FastAPIアプリケーションの作成

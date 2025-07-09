@@ -1,20 +1,17 @@
-document.addEventListener('DOMContentLoaded', () => {
+// $(function() { ... }) は、HTMLの読み込みが完了したら中のコードを実行するという意味
+$(function () {
 
     // --- 1. CSVデータのグラフ表示 ---
-    const drawChart = async () => {
-        const chartCanvas = document.getElementById('myChart');
-        if (!chartCanvas) return;
+    const drawChart = () => {
+        const $chartCanvas = $('#myChart'); // jQueryで要素を選択
+        if ($chartCanvas.length === 0) return;
 
-        // HTMLのdata属性からCSVファイルのURLを取得
-        const csvUrl = chartCanvas.dataset.csvUrl;
+        // jQueryでdata属性からURLを取得
+        const csvUrl = $chartCanvas.data('csv-url');
 
-        try {
-            const response = await fetch(csvUrl);
-            if (!response.ok) throw new Error('CSVファイルの読み込みに失敗しました。');
-
-            const csvData = await response.text();
-
-            const rows = csvData.trim().split('\n').slice(1); // ヘッダー行をスキップ
+        // jQueryのAjax通信 (GET)
+        $.get(csvUrl, (csvData) => {
+            const rows = csvData.trim().split('\n').slice(1);
             const labels = [];
             const pressureData = [];
             const airAmountData = [];
@@ -26,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 airAmountData.push(parseFloat(airAmount));
             });
 
-            const ctx = chartCanvas.getContext('2d');
+            const ctx = $chartCanvas[0].getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -44,41 +41,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 }
             });
-        } catch (error) {
+        }).fail((error) => {
             console.error('グラフ描画エラー:', error);
-        }
+        });
     };
 
     // --- 2. 枕セグメントのクリックとデータ送信 ---
     const setupSegmentClick = () => {
-        const segmentsContainer = document.getElementById('pillow-segments');
-        if (!segmentsContainer) return;
+        const $segmentsContainer = $('#pillow-segments');
+        if ($segmentsContainer.length === 0) return;
 
-        // HTMLのdata属性からデータ送信先のURLを取得
-        const sendDataUrl = segmentsContainer.dataset.sendUrl;
+        const sendDataUrl = $segmentsContainer.data('send-url');
 
-        segmentsContainer.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('segment')) {
-                const segmentNumber = event.target.dataset.segment;
+        // jQueryのイベント委任 (より簡潔)
+        // #pillow-segments の中の .segment がクリックされた時だけ実行
+        $segmentsContainer.on('click', '.segment', function () {
+            const segmentNumber = $(this).data('segment'); // クリックされた要素のdata属性を取得
 
-                try {
-                    const response = await fetch(sendDataUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ segment: segmentNumber }),
-                    });
-
-                    if (!response.ok) throw new Error('サーバーへのデータ送信に失敗しました。');
-
-                    const result = await response.json();
+            // jQueryのAjax通信 (POST)
+            $.ajax({
+                url: sendDataUrl,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ segment: segmentNumber })
+            })
+                .done((result) => {
                     console.log('サーバーからの応答:', result);
                     alert(`セグメント ${result.received_data} のデータを送信しました。`);
-
-                } catch (error) {
+                })
+                .fail((error) => {
                     console.error('データ送信エラー:', error);
                     alert('データの送信に失敗しました。');
-                }
-            }
+                });
         });
     };
 
