@@ -17,7 +17,7 @@
         <div>
             <h2>圧力（Pressure）時系列グラフ</h2>
             <canvas id="pressureChart" width="400" height="250"
-                data-csv-url="{{ url_for('static', path='data.csv') }}"></canvas>
+                data-csv-url="{{ url_for('static', path='data/data.csv') }}"></canvas>
         </div>
 
         <div>
@@ -27,7 +27,7 @@
 
         <div>
             <h2>Unityシミュレーション動画</h2>
-            <video width="400" controls muted loop src="{{ url_for('static', path='simulation.mp4') }}"></video>
+            <video width="400" controls muted loop src="{{ url_for('static', path='video/simulation.mp4') }}"></video>
         </div>
     </div>
 
