@@ -53,7 +53,11 @@ $(function () {
             new Chart(pressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: pressureDatasets },
-                options: { plugins: { legend: { position: 'top' } } }
+                options: {
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
             });
 
             // 空気圧グラフを描画
@@ -61,7 +65,11 @@ $(function () {
             new Chart(airPressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: airPressureDatasets },
-                options: { plugins: { legend: { position: 'top' } } }
+                options: {
+                    responsive: true,
+                    // maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } }
+                }
             });
 
         }).fail((error) => console.error('グラフ描画エラー:', error));
