@@ -19,7 +19,7 @@ h1 {
     color: #2c3e50;
     margin-bottom: 30px;
     font-size: 2.5rem;
-    font-weight: 300;
+    font-weight: 500;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -40,6 +40,7 @@ h1 {
     padding: 25px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 400px; /* 最小高さを追加 */
 }
 
 .chart-container:hover {
@@ -56,10 +57,18 @@ h1 {
     padding-bottom: 10px;
 }
 
+/* チャート用のラッパー */
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  margin-top: 10px;
+}
+
 /* キャンバススタイル */
 canvas {
     max-width: 100%;
-    height: auto;
+    height: 300px !important;
     border-radius: 8px;
 }
 
@@ -103,60 +112,80 @@ hr {
     font-size: 1.1rem;
 }
 
-/* 枕セグメントグリッド */
+/* 枕セグメントグリッド - 画像に合わせて枕型に */
 #pillow-segments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-width: 300px;
+    grid-template-rows: repeat(2, 1fr);
+    max-width: 400px;
     margin: 0 auto;
+    background: #333;
+    border: 2px solid #333;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    gap: 2px;
 }
 
-/* 個別セグメントスタイル */
+/* 個別セグメントスタイル - 画像に合わせて調整 */
 .segment {
-    width: 80px;
+    width: 100%;
     height: 80px;
-    background: linear-gradient(135deg, #74b9ff, #0984e3);
-    color: white;
+    background: #f8f9fa;
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: bold;
-    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(116, 185, 255, 0.3);
+    transition: all 0.3s ease; 
     user-select: none;
 }
 
+/* セグメントの境界線調整 */
+.segment:nth-child(1) {
+    border-top-left-radius: 23px;
+}
+
+.segment:nth-child(3) {
+    border-top-right-radius: 23px;
+}
+
+.segment:nth-child(4) {
+    border-bottom-left-radius: 23px;
+}
+
+.segment:nth-child(6) {
+    border-bottom-right-radius: 23px;
+}
+
+/* ホバーエフェクト */
 .segment:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(116, 185, 255, 0.4);
-    background: linear-gradient(135deg, #81ecec, #00b894);
+    background: #e9ecef;
 }
 
 .segment:active {
-    transform: translateY(-1px) scale(1.02);
+    background: #dee2e6;
 }
 
 /* アクティブ状態のセグメント */
 .segment.active {
-    background: linear-gradient(135deg, #fd79a8, #e84393);
-    box-shadow: 0 6px 15px rgba(253, 121, 168, 0.4);
+    background: #007bff;
+    color: white;
     animation: pulse 1.5s infinite;
 }
 
 /* パルスアニメーション */
 @keyframes pulse {
     0% {
-        box-shadow: 0 6px 15px rgba(253, 121, 168, 0.4);
+        box-shadow: inset 0 0 0 0 rgba(0, 123, 255, 0.4);
     }
     50% {
-        box-shadow: 0 6px 25px rgba(253, 121, 168, 0.6);
+        box-shadow: inset 0 0 0 10px rgba(0, 123, 255, 0.2);
     }
     100% {
-        box-shadow: 0 6px 15px rgba(253, 121, 168, 0.4);
+        box-shadow: inset 0 0 0 0 rgba(0, 123, 255, 0.4);
     }
 }
 
@@ -185,14 +214,12 @@ hr {
     }
     
     #pillow-segments {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 200px;
+        max-width: 300px;
     }
     
     .segment {
-        width: 70px;
-        height: 70px;
-        font-size: 1.3rem;
+        height: 60px;
+        font-size: 1.5rem;
     }
 }
 
@@ -209,17 +236,21 @@ hr {
         font-size: 1.4rem;
     }
     
+    #pillow-segments {
+        max-width: 250px;
+    }
+    
     .segment {
-        width: 60px;
-        height: 60px;
-        font-size: 1.2rem;
+        height: 50px;
+        font-size: 1.3rem;
     }
 }
 
 /* アクセシビリティ向上 */
 .segment:focus {
-    outline: 3px solid #fdcb6e;
-    outline-offset: 2px;
+    outline: 3px solid #007bff;
+    outline-offset: -3px;
+    z-index: 1;
 }
 
 /* プリント用スタイル */
@@ -235,8 +266,37 @@ hr {
         border: 1px solid #ccc;
     }
     
-    .segment {
-        background: #f0f0f0 !important;
-        color: black !important;
+    #pillow-segments {
+        border: 2px solid black;
     }
+    
+    .segment {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black !important;
+    }
+}
+
+/* エラーメッセージのスタイル */
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* セグメントのフラッシュエフェクト */
+.segment.success-flash {
+    background: #28a745 !important;
+    transform: scale(1.05);
+}
+
+.segment.error-flash {
+    background: #dc3545 !important;
+    transform: scale(1.05);
+}
+
+/* チャートコンテナの高さ設定 */
+.chart-container canvas {
+    height: 300px !important;
 }

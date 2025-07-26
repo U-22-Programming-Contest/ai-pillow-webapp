@@ -1,77 +1,4 @@
-// $(function () {
-//     const drawCharts = () => {
-//         const $pressureCanvas = $('#pressureChart');
-//         const $airPressureCanvas = $('#airPressureChart');
-//         if ($pressureCanvas.length === 0 || $airPressureCanvas.length === 0) return;
-
-//         const csvUrl = $pressureCanvas.data('csv-url');
-
-//         $.get(csvUrl, (csvData) => {
-//             const rows = csvData.trim().split('\n');
-//             const headers = rows[0].split(',');
-//             const dataRows = rows.slice(1);
-
-//             // データを準備
-//             const labels = [];
-//             const pressureDatasets = [];
-//             const airPressureDatasets = [];
-
-//             // ヘッダーを元にデータセットの骨格を作成
-//             headers.forEach((header, i) => {
-//                 const dataset = {
-//                     label: header,
-//                     data: [],
-//                     tension: 0.1,
-//                     borderWidth: 2
-//                 };
-//                 if (header.startsWith('Pressure')) {
-//                     pressureDatasets.push(dataset);
-//                 } else if (header.startsWith('AirPressure')) {
-//                     airPressureDatasets.push(dataset);
-//                 }
-//             });
-
-//             // CSVの各行のデータを振り分ける
-//             dataRows.forEach((row, index) => {
-//                 labels.push(index + 1);
-//                 const values = row.split(',');
-//                 let pIndex = 0;
-//                 let aIndex = 0;
-//                 values.forEach((value, i) => {
-//                     if (headers[i].startsWith('Pressure')) {
-//                         pressureDatasets[pIndex].data.push(parseFloat(value));
-//                         pIndex++;
-//                     } else if (headers[i].startsWith('AirPressure')) {
-//                         airPressureDatasets[aIndex].data.push(parseFloat(value));
-//                         aIndex++;
-//                     }
-//                 });
-//             });
-
-//             // 圧力グラフを描画
-//             const pressureCtx = $pressureCanvas[0].getContext('2d');
-//             new Chart(pressureCtx, {
-//                 type: 'line',
-//                 data: { labels: labels, datasets: pressureDatasets },
-//                 options: {
-//                     responsive: true,
-//                     plugins: { legend: { position: 'top' } }
-//                 }
-//             });
-
-//             // 空気圧グラフを描画
-//             const airPressureCtx = $airPressureCanvas[0].getContext('2d');
-//             new Chart(airPressureCtx, {
-//                 type: 'line',
-//                 data: { labels: labels, datasets: airPressureDatasets },
-//                 options: {
-//                     responsive: true,
-//                     plugins: { legend: { position: 'top' } }
-//                 }
-//             });
-
-//         }).fail((error) => console.error('グラフ描画エラー:', error));
-//     };
+// import { Chart } from "@/components/ui/chart"
 
 $(function () {
     const drawCharts = () => {
@@ -100,25 +27,18 @@ $(function () {
             ];
 
             headers.forEach((header, i) => {
-                const color = colors[i % colors.length]; // 色を順番に割り当て
+                const color = colors[i % colors.length];
+                // ラベル名を短縮する (例: "Pressure1" -> "P1")
+                const shortLabel = header.replace('Pressure', 'P').replace('Air', 'A');
                 const dataset = {
-                    // 凡例やツールチップに表示される線の名前
                     label: header,
-                    // グラフにプロットする数値データを入れる配列
                     data: [],
-                    // 線の色
                     borderColor: color,
-                    // 線の下を塗りつぶす場合の色（線の色を少し透明にしたもの）
                     backgroundColor: color.replace('1)', '0.2)'),
-                    // 線の下を塗りつぶすかどうか (true/false)
                     fill: false,
-                    // 線の曲がり具合 (0は真っ直ぐ)
                     tension: 0.1,
-                    // 線の太さ（ピクセル）
                     borderWidth: 2,
-                    // データ点の円の半径（サイズ）
-                    pointRadius: 3,
-                    // データ点の塗りつぶし色
+                    pointRadius: 1.5,
                     pointBackgroundColor: color,
                 };
 
@@ -143,25 +63,27 @@ $(function () {
                 let aIndex = 0;
                 values.forEach((value, i) => {
                     if (headers[i].startsWith('Pressure')) {
-                        pressureDatasets[pIndex++].data.push(parseFloat(value));
+                        pressureDatasets[pIndex++].data.push(parseFloat(value) || 0);
                     } else if (headers[i].startsWith('AirPressure')) {
-                        airPressureDatasets[aIndex++].data.push(parseFloat(value));
+                        airPressureDatasets[aIndex++].data.push(parseFloat(value) || 0);
                     }
                 });
             });
 
-            // --- 圧力グラフの描画 (オプションを追加) ---
+            // 圧力グラフの描画
             const pressureCtx = $pressureCanvas[0].getContext('2d');
             new Chart(pressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: pressureDatasets },
                 options: {
-                    responsive: true, // レスポンシブ対応
+                    responsive: true,
+                    maintainAspectRatio: false, // 追加：アスペクト比を固定しない
                     scales: {
                         x: {
                             title: {
                                 display: true,
-                                text: '時間'
+                                text: '時間',
+                                font: { size: 14 }
                             },
                             ticks: {
                                 maxTicksLimit: 10
@@ -170,38 +92,47 @@ $(function () {
                         y: {
                             title: {
                                 display: true,
-                                text: '圧力'
-                            }
+                                text: '圧力',
+                                font: { size: 14 }
+                            },
                         }
                     },
                     plugins: {
-                        legend: { // 凡例（ラベル）の設定
+                        legend: {
                             position: 'top',
                             labels: {
-                                font: { size: 12 }
+                                font: { size: 12 },
+                                usePointStyle: true // 追加：点のスタイルを使用
                             }
                         },
-                        title: { // グラフタイトルの設定
+                        title: {
                             display: true,
                             text: '圧力データ',
-                            font: { size: 16 }
-                        }
+                            font: { size: 16, weight: 'bold' }
+                        },
+                    },
+                    interaction: { // 追加：インタラクションの設定
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             });
 
-            // --- 空気圧グラフの描画 (オプションを追加) ---
+            // 空気圧グラフの描画
             const airPressureCtx = $airPressureCanvas[0].getContext('2d');
             new Chart(airPressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: airPressureDatasets },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             title: {
                                 display: true,
-                                text: '時間'
+                                text: '時間',
+                                font: { size: 14 }
                             },
                             ticks: {
                                 maxTicksLimit: 10
@@ -210,7 +141,8 @@ $(function () {
                         y: {
                             title: {
                                 display: true,
-                                text: '空気圧'
+                                text: '空気圧',
+                                font: { size: 14 }
                             }
                         }
                     },
@@ -218,38 +150,81 @@ $(function () {
                         legend: {
                             position: 'top',
                             labels: {
-                                font: { size: 12 }
+                                font: { size: 12 },
+                                usePointStyle: true
                             }
                         },
                         title: {
                             display: true,
                             text: '空気圧データ',
-                            font: { size: 16 }
-                        }
+                            font: { size: 16, weight: 'bold' }
+                        },
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             });
 
-        }).fail((error) => console.error('グラフ描画エラー:', error));
+        }).fail((error) => {
+            console.error('グラフ描画エラー:', error);
+            // エラー時にユーザーに分かりやすいメッセージを表示
+            $('#pressureChart').parent().append('<p class="error-message">グラフの読み込みに失敗しました。</p>');
+            $('#airPressureChart').parent().append('<p class="error-message">グラフの読み込みに失敗しました。</p>');
+        });
     };
+
     const setupSegmentClick = () => {
-        // (省略) この部分は変更なし
         const $segmentsContainer = $('#pillow-segments');
         if ($segmentsContainer.length === 0) return;
-        const sendDataUrl = $segmentsContainer.data('send-url');
+
+        // data-send-url属性がない場合のフォールバック
+        const sendDataUrl = $segmentsContainer.data('send-url') || '/receive_data';
+
         $segmentsContainer.on('click', '.segment', function () {
-            const segmentNumber = $(this).data('segment');
+            const $segment = $(this);
+            const segmentNumber = $segment.data('segment');
+
+            // セグメントの状態をトグル
+            $segment.toggleClass('active');
+
+            // 視覚的フィードバック（一時的に無効化）
+            $segment.prop('disabled', true);
+
             $.ajax({
                 url: sendDataUrl,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ segment: segmentNumber })
+                data: JSON.stringify({
+                    segment: segmentNumber,
+                    active: $segment.hasClass('active')
+                }),
+                timeout: 5000 // 5秒でタイムアウト
             })
-                .done((result) => alert(`セグメント ${result.received_data} のデータを送信しました。`))
-                .fail((error) => alert('データの送信に失敗しました。'));
+                .done((result) => {
+                    console.log(`セグメント ${segmentNumber} のデータを送信しました:`, result);
+                    // 成功時の視覚的フィードバック（オプション）
+                    $segment.addClass('success-flash');
+                    setTimeout(() => $segment.removeClass('success-flash'), 300);
+                })
+                .fail((error) => {
+                    console.error('データの送信に失敗しました:', error);
+                    // エラー時はアクティブ状態を元に戻す
+                    $segment.toggleClass('active');
+                    // エラーの視覚的フィードバック
+                    $segment.addClass('error-flash');
+                    setTimeout(() => $segment.removeClass('error-flash'), 300);
+                })
+                .always(() => {
+                    // 常に実行：セグメントを再度有効化
+                    $segment.prop('disabled', false);
+                });
         });
     };
 
+    // 初期化
     drawCharts();
     setupSegmentClick();
 });
