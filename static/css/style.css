@@ -227,7 +227,12 @@ hr {
     h1 {
         font-size: 1.8rem;
     }
-    
+
+    .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
     .chart-container h2 {
         font-size: 1.2rem;
     }
@@ -294,9 +299,4 @@ hr {
 .segment.error-flash {
     background: #dc3545 !important;
     transform: scale(1.05);
-}
-
-/* チャートコンテナの高さ設定 */
-.chart-container canvas {
-    height: 300px !important;
 }

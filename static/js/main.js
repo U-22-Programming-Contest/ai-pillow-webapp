@@ -1,6 +1,7 @@
 // import { Chart } from "@/components/ui/chart"
 
 $(function () {
+    let createdCharts = [];
     const drawCharts = () => {
         const $pressureCanvas = $('#pressureChart');
         const $airPressureCanvas = $('#airPressureChart');
@@ -72,7 +73,7 @@ $(function () {
 
             // 圧力グラフの描画
             const pressureCtx = $pressureCanvas[0].getContext('2d');
-            new Chart(pressureCtx, {
+            const pressureChart = new Chart(pressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: pressureDatasets },
                 options: {
@@ -110,6 +111,10 @@ $(function () {
                             text: '圧力データ',
                             font: { size: 16, weight: 'bold' }
                         },
+                        tooltip: { // 追加：ツールチップの設定
+                            mode: 'index',
+                            intersect: false,
+                        }
                     },
                     interaction: { // 追加：インタラクションの設定
                         mode: 'nearest',
@@ -118,10 +123,11 @@ $(function () {
                     }
                 }
             });
+            createdCharts.push(pressureChart);
 
             // 空気圧グラフの描画
             const airPressureCtx = $airPressureCanvas[0].getContext('2d');
-            new Chart(airPressureCtx, {
+            const airPressureChart = new Chart(airPressureCtx, {
                 type: 'line',
                 data: { labels: labels, datasets: airPressureDatasets },
                 options: {
@@ -159,6 +165,10 @@ $(function () {
                             text: '空気圧データ',
                             font: { size: 16, weight: 'bold' }
                         },
+                        tooltip: { // 追加：ツールチップの設定
+                            mode: 'index',
+                            intersect: false,
+                        }
                     },
                     interaction: {
                         mode: 'nearest',
@@ -167,6 +177,7 @@ $(function () {
                     }
                 }
             });
+            createdCharts.push(airPressureChart);
 
         }).fail((error) => {
             console.error('グラフ描画エラー:', error);
@@ -223,8 +234,19 @@ $(function () {
                 });
         });
     };
+    const setupTooltipHiding = () => {
+        $(document).on('click touchstart', function (event) {
+            if (!$(event.target).closest('canvas').length) {
+                createdCharts.forEach(chart => {
+                    chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                    chart.update();
+                });
+            }
+        });
+    };
 
     // 初期化
     drawCharts();
     setupSegmentClick();
+    setupTooltipHiding();
 });
