@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 class SegmentData(BaseModel):
     segment: int
+    active: bool
 
 
 # FastAPIアプリケーションの作成
@@ -35,8 +36,9 @@ async def receive_data(data: SegmentData):
     フロントエンドからPOSTリクエストで送られてきたデータを受け取る
     """
     segment_number = data.segment
-    print(f"タッチされたセグメント: {segment_number}")
+    is_active = data.active
+    print(f"タッチされたセグメント: {segment_number}, アクティブ状態: {is_active}")
 
     # ここで受け取った数値を使って、Python側でさらに処理を追加できる
 
-    return {"status": "success", "received_data": segment_number}
+    return {"status": "success", "received_data": segment_number, "active_status": is_active}
