@@ -29,9 +29,10 @@
             </div>
         </div>
 
-        <div class="chart-container">
+        <div class="chart-container video-container">
             <h2>Unityシミュレーション動画</h2>
-            <video controls muted loop src="{{ url_for('static', path='video/simulation.mp4') }}"></video>
+            <video playsinline controls muted loop src="{{ url_for('static', path='video/simulation.mp4') }}"
+                poster="{{ url_for('static', path='image/simulation_preview.png') }}"></video>
         </div>
     </div>
 

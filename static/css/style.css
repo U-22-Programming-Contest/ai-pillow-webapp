@@ -72,6 +72,11 @@ canvas {
     border-radius: 8px;
 }
 
+.video-container {
+    height: auto; /* 高さをコンテンツ（動画）に合わせる */
+    min-height: 0;  /* chart-containerから継承したmin-heightをリセット */
+}
+
 /* ビデオスタイル */
 video {
     width: 100%;
@@ -160,10 +165,12 @@ hr {
     border-bottom-right-radius: 23px;
 }
 
-/* ホバーエフェクト */
-.segment:hover {
-    background: #f8bbd9;
-    box-shadow: 0 2px 8px rgba(248, 187, 217, 0.4);
+/* ホバーエフェクト (マウス操作時のみ適用) */
+@media (hover: hover) {
+    .segment:hover {
+        background: #f8bbd9;
+        box-shadow: 0 2px 8px rgba(248, 187, 217, 0.4);
+    }
 }
 
 /* アクティブ状態のセグメント */
