@@ -63,7 +63,7 @@ git clone https://github.com/U-22-Programming-Contest/ai-pillow-webapp.git
 py -3.11 -m venv .venv
 ```
 
-仮想環境を有効化
+仮想環境を有効化(PowerShellだとエラーが出るので、Command Promptで実行してください。)
 ```
 .venv\Scripts\activate
 ```
