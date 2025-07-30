@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pillow Web app</title>
+    <script src="{{ url_for('static', path='js/chart.umd.js') }}"></script>
+    <script src="{{ url_for('static', path='js/jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+
+<body>
+
+    <h1>AI Pillow Web app</h1>
+
+    <div class="container">
+        <div class="chart-container">
+            <h2>圧力（Pressure）グラフ</h2>
+            <div class="chart-wrapper">
+                <canvas id="pressureChart" data-csv-url="{{ url_for('static', path='data/data.csv') }}"></canvas>
+            </div>
+            <div class="controls-container">
+                <button class="playPauseBtn">再生</button>
+                <button class="resetBtn">リセット</button>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>空気圧（AirPressure）グラフ</h2>
+            <div class="chart-wrapper">
+                <canvas id="airPressureChart"></canvas>
+            </div>
+            <div class="controls-container">
+                <button class="playPauseBtn">再生</button>
+                <button class="resetBtn">リセット</button>
+            </div>
+        </div>
+
+        <div class="chart-container video-container">
+            <h2>Unityシミュレーション動画</h2>
+            <video playsinline controls muted loop src="{{ url_for('static', path='video/simulation.mp4') }}"
+                poster="{{ url_for('static', path='image/simulation_preview.png') }}"></video>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="segment-container">
+        <h2>枕セグメントの操作</h2>
+        <p>下の枕のセグメントをクリックすると、対応する数値が送信されます。</p>
+        <div id="pillow-segments" data-send-url="{{ url_for('receive_data') }}">
+            <div class="segment" data-segment="1">1</div>
+            <div class="segment" data-segment="2">2</div>
+            <div class="segment" data-segment="3">3</div>
+            <div class="segment" data-segment="4">4</div>
+            <div class="segment" data-segment="5">5</div>
+            <div class="segment" data-segment="6">6</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+</body>
+
+</html>

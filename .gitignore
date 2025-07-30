@@ -1,0 +1,10 @@
+# .gitignore
+
+# 仮想環境フォルダ
+.venv/
+
+# Python bytecode cache
+__pycache__/
+
+# vscode設定ファイル
+.vscode
