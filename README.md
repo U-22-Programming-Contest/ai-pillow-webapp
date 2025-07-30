@@ -53,7 +53,7 @@
 git clone https://github.com/U-22-Programming-Contest/ai-pillow-webapp.git
 ```
 
-#### ステップ2: 仮想環境を作成して有効化する
+#### ステップ2: Windowsで仮想環境を作成して有効化する
 次に、このプロジェクト専用のPython環境を新しく作ります。
 
 [Python 3.11.9](https://www.python.org/downloads/release/python-3119/) をインストールして次のコマンドを実行します。
@@ -63,18 +63,13 @@ git clone https://github.com/U-22-Programming-Contest/ai-pillow-webapp.git
 py -3.11 -m venv .venv
 ```
 
-仮想環境を有効化 (Windows)
+仮想環境を有効化
 ```
 .venv\Scripts\activate
 ```
 
-仮想環境を有効化 (macOS/Linux)
-```
-source .venv/bin/activate
-```
-
 #### ステップ3: ライブラリを一括インストールする
-最後に、requirements.txt を使って、プロジェクトに必要なライブラリをすべてインストールします。
+最後に、requirements.txt を使って、プロジェクトに必要なライブラリをすべてインストールするために次のコマンドを実行します。
 ```
 pip install -r requirements.txt
 ```
@@ -89,7 +84,9 @@ pipが requirements.txt の中身を読み込み、記載されているライ�
 ```
 uvicorn main:app --reload
 ```
-そして、http://127.0.0.1:8000 を開くと、Webサイトを開けます。
+そして、
+http://127.0.0.1:8000
+にアクセスすると、Webサイトを開けます。
 
 #### 外部(スマホなど)からアクセスしたい場合
 次のコマンドでサーバーを起動します。
@@ -97,10 +94,16 @@ uvicorn main:app --reload
 uvicorn main:app --reload --host 0.0.0.0
 ```
 
-そして、同じWi-Fiに接続した端末から
+そして、同じWi-Fiに接続した端末(スマホ等)から
 http:// xxx.xxx.xxx.xxx:8000
 (xxx.xxx.xxx.xxx はサーバを起動したPCのIPアドレス)
-上記のURL にアクセスすると、Webサイトを開けます。
+にアクセスすると、外部からWebサイトを開けます。
+
+PCのIPアドレスを確認する場合は次のコマンドを実行します。
+
+```
+ipconfig
+``` 
 
 ---
 
