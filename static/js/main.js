@@ -1,190 +1,138 @@
-// import { Chart } from "@/components/ui/chart"
-
 $(function () {
-    let createdCharts = [];
-    const drawCharts = () => {
-        const $pressureCanvas = $('#pressureChart');
-        const $airPressureCanvas = $('#airPressureChart');
-        if ($pressureCanvas.length === 0 || $airPressureCanvas.length === 0) return;
+    const chartControls = {
+        pressureChart: {
+            instance: null, currentIndex: 0, isPlaying: false, updateInterval: null, datasets: []
+        },
+        airPressureChart: {
+            instance: null, currentIndex: 0, isPlaying: false, updateInterval: null, datasets: []
+        }
+    };
 
-        const csvUrl = $pressureCanvas.data('csv-url');
+    let createdCharts = [];
+    let fullDataRows = [];
+    let headers = [];
+    const UPDATE_SPEED = 200;
+    const MAX_DATA_POINTS = 10;
+
+    const drawCharts = () => {
+        const csvUrl = $('#pressureChart').data('csv-url');
+        if (!csvUrl) return;
 
         $.get(csvUrl, (csvData) => {
             const rows = csvData.trim().split('\n');
-            const headers = rows[0].split(',');
-            const dataRows = rows.slice(1);
+            headers = rows[0].split(',');
+            fullDataRows = rows.slice(1);
+            initializeEmptyCharts();
+        }).fail((error) => console.error('グラフ描画エラー:', error));
+    };
 
-            const labels = [];
-            const pressureDatasets = [];
-            const airPressureDatasets = [];
+    const initializeEmptyCharts = () => {
+        const colors = ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'];
 
-            // グラフの色を定義しておく
-            const colors = [
-                'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)',
-                'rgba(99, 255, 132, 1)', 'rgba(162, 54, 235, 1)',
-                'rgba(206, 255, 86, 1)', 'rgba(192, 75, 192, 1)'
-            ];
-
-            headers.forEach((header, i) => {
-                const color = colors[i % colors.length];
-                // ラベル名を短縮する (例: "Pressure1" -> "P1")
-                const shortLabel = header.replace('Pressure', 'P').replace('Air', 'A');
-                const dataset = {
-                    label: header,
-                    data: [],
-                    borderColor: color,
-                    backgroundColor: color.replace('1)', '0.2)'),
-                    fill: false,
-                    tension: 0.1,
-                    borderWidth: 2,
-                    pointRadius: 1.5,
-                    pointBackgroundColor: color,
-                };
-
-                if (header.startsWith('Pressure')) {
-                    pressureDatasets.push(dataset);
-                } else if (header.startsWith('AirPressure')) {
-                    airPressureDatasets.push(dataset);
-                }
-            });
-
-            dataRows.forEach((row) => {
-                const values = row.split(',');
-                // 1列目の値が空か数値でなければ、その行はスキップ
-                if (!values[0] || isNaN(parseFloat(values[0]))) {
-                    return;
-                }
-
-                // 有効な行だけをカウントしてラベルを追加
-                labels.push(labels.length);
-
-                let pIndex = 0;
-                let aIndex = 0;
-                values.forEach((value, i) => {
-                    if (headers[i].startsWith('Pressure')) {
-                        pressureDatasets[pIndex++].data.push(parseFloat(value) || 0);
-                    } else if (headers[i].startsWith('AirPressure')) {
-                        airPressureDatasets[aIndex++].data.push(parseFloat(value) || 0);
-                    }
-                });
-            });
-
-            // 圧力グラフの描画
-            const pressureCtx = $pressureCanvas[0].getContext('2d');
-            const pressureChart = new Chart(pressureCtx, {
-                type: 'line',
-                data: { labels: labels, datasets: pressureDatasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // 追加：アスペクト比を固定しない
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '時間',
-                                font: { size: 14 }
-                            },
-                            ticks: {
-                                maxTicksLimit: 10
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '圧力',
-                                font: { size: 14 }
-                            },
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: { size: 12 },
-                                usePointStyle: true // 追加：点のスタイルを使用
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: '圧力データ',
-                            font: { size: 16, weight: 'bold' }
-                        },
-                        tooltip: { // 追加：ツールチップの設定
-                            mode: 'index',
-                            intersect: false,
-                        }
-                    },
-                    interaction: { // 追加：インタラクションの設定
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    }
-                }
-            });
-            createdCharts.push(pressureChart);
-
-            // 空気圧グラフの描画
-            const airPressureCtx = $airPressureCanvas[0].getContext('2d');
-            const airPressureChart = new Chart(airPressureCtx, {
-                type: 'line',
-                data: { labels: labels, datasets: airPressureDatasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '時間',
-                                font: { size: 14 }
-                            },
-                            ticks: {
-                                maxTicksLimit: 10
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '空気圧',
-                                font: { size: 14 }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: { size: 12 },
-                                usePointStyle: true
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: '空気圧データ',
-                            font: { size: 16, weight: 'bold' }
-                        },
-                        tooltip: { // 追加：ツールチップの設定
-                            mode: 'index',
-                            intersect: false,
-                        }
-                    },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    }
-                }
-            });
-            createdCharts.push(airPressureChart);
-
-        }).fail((error) => {
-            console.error('グラフ描画エラー:', error);
-            // エラー時にユーザーに分かりやすいメッセージを表示
-            $('#pressureChart').parent().append('<p class="error-message">グラフの読み込みに失敗しました。</p>');
-            $('#airPressureChart').parent().append('<p class="error-message">グラフの読み込みに失敗しました。</p>');
+        headers.forEach((header, i) => {
+            const color = colors[i % colors.length];
+            const dataset = { label: header, data: [], borderColor: color, backgroundColor: color.replace('1)', '0.2)'), fill: false, tension: 0.1, borderWidth: 2, pointRadius: 1.5 };
+            if (header.startsWith('Pressure')) {
+                chartControls.pressureChart.datasets.push(dataset);
+            } else if (header.startsWith('AirPressure')) {
+                chartControls.airPressureChart.datasets.push(dataset);
+            }
         });
+
+        const chartOptions = (yAxisTitle, chartTitle) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 0 },
+            scales: {
+                x: { title: { display: true, text: '時間 (s)', font: { size: 14 } } },
+                y: { title: { display: true, text: yAxisTitle, font: { size: 14 } }, beginAtZero: true }
+            },
+            plugins: {
+                legend: {
+                    position: 'top', labels: { font: { size: 12 }, usePointStyle: true },
+                },
+                title: { display: true, text: chartTitle, font: { size: 16, weight: 'bold' } },
+                tooltip: {
+                    mode: 'index', intersect: false,
+                }
+            }
+        });
+
+        const pressureCtx = $('#pressureChart')[0].getContext('2d');
+        chartControls.pressureChart.instance = new Chart(pressureCtx, { type: 'line', data: { labels: [], datasets: chartControls.pressureChart.datasets }, options: chartOptions('圧力 (kg)', '圧力データ') });
+        createdCharts.push(chartControls.pressureChart.instance);
+
+        const airPressureCtx = $('#airPressureChart')[0].getContext('2d');
+        chartControls.airPressureChart.instance = new Chart(airPressureCtx, { type: 'line', data: { labels: [], datasets: chartControls.airPressureChart.datasets }, options: chartOptions('空気圧 (psi)', '空気圧データ') });
+        createdCharts.push(chartControls.airPressureChart.instance);
+    };
+
+    const updateChartStepByStep = (chartId) => {
+        const control = chartControls[chartId];
+        if (control.currentIndex >= fullDataRows.length) {
+            control.currentIndex = 0;
+        }
+
+        const row = fullDataRows[control.currentIndex];
+        const values = row.split(',');
+        const chart = control.instance;
+
+        chart.data.labels.push(control.currentIndex);
+        if (chart.data.labels.length > MAX_DATA_POINTS) {
+            chart.data.labels.shift();
+        }
+
+        let pIndex = 0;
+        let aIndex = 0;
+        headers.forEach((header, i) => {
+            const value = values[i];
+            if (header.startsWith('Pressure') && chartId === 'pressureChart') {
+                const dataArray = chart.data.datasets[pIndex].data;
+                dataArray.push((parseFloat(value) || 0) / 100);
+                if (dataArray.length > MAX_DATA_POINTS) dataArray.shift();
+                pIndex++;
+            } else if (header.startsWith('AirPressure') && chartId === 'airPressureChart') {
+                const dataArray = chart.data.datasets[aIndex].data;
+                dataArray.push(parseFloat(value) || 0);
+                if (dataArray.length > MAX_DATA_POINTS) dataArray.shift();
+                aIndex++;
+            }
+        });
+        chart.update('none');
+        control.currentIndex++;
+    };
+
+    const playPause = (chartId, forcePause = false) => {
+        const control = chartControls[chartId];
+        const $button = $(`#${chartId}`).closest('.chart-container').find('.playPauseBtn');
+
+        if (control.isPlaying && !forcePause) {
+            clearInterval(control.updateInterval);
+            $button.text('再生');
+        } else if (!control.isPlaying && !forcePause) {
+            if (control.currentIndex >= fullDataRows.length) {
+                stopAnimation(chartId);
+            }
+            control.updateInterval = setInterval(() => updateChartStepByStep(chartId), UPDATE_SPEED);
+            $button.text('一時停止');
+        } else {
+            clearInterval(control.updateInterval);
+            $button.text('再生');
+        }
+        control.isPlaying = forcePause ? false : !control.isPlaying;
+    };
+
+    const resetAnimation = (chartId) => {
+        const control = chartControls[chartId];
+        if (control.isPlaying) {
+            playPause(chartId, true);
+        }
+        control.currentIndex = 0;
+        control.instance.data.labels = [];
+        control.instance.data.datasets.forEach(dataset => {
+            dataset.data = [];
+        });
+        control.instance.update();
     };
 
     const setupSegmentClick = () => {
@@ -244,6 +192,16 @@ $(function () {
             }
         });
     };
+
+    $('.playPauseBtn').on('click', function () {
+        const chartId = $(this).closest('.chart-container').find('canvas').attr('id');
+        playPause(chartId);
+    });
+
+    $('.resetBtn').on('click', function () {
+        const chartId = $(this).closest('.chart-container').find('canvas').attr('id');
+        resetAnimation(chartId);
+    });
 
     // 初期化
     drawCharts();

@@ -307,3 +307,25 @@ hr {
     font-style: italic;
     margin-top: 20px;
 }
+
+.controls-container {
+    text-align: center;
+    margin-top: auto; /* ← margin-bottom を margin-top に変更し、autoに */
+    padding-top: 15px; /* ← 上に少し余白を追加 */
+}
+
+.controls-container button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.controls-container button:hover {
+    background-color: #2980b9;
+}
