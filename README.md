@@ -109,8 +109,8 @@ ipconfig
 
 ### 🖼️ 出力イメージ例
 <p align="center">
-  <img src="image/webapp1.png" width="45%" style="display:inline-block; margin-right:10px;" />
-  <img src="image/webapp2.png" width="45%" style="display:inline-block;" />
+  <img src="image/Webapp1.png" width="45%" style="display:inline-block; margin-right:10px;" />
+  <img src="image/Webapp2.png" width="45%" style="display:inline-block;" />
 </p>
 
 ---
